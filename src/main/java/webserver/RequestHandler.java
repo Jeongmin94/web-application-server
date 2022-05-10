@@ -1,13 +1,15 @@
 package webserver;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.Socket;
+import java.nio.file.Files;
 
+import controller.Controller;
+import model.RequestInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import util.HttpRequestUtils;
+import util.HttpRequestUtils.Pair;
 
 public class RequestHandler extends Thread {
     private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
@@ -24,8 +26,13 @@ public class RequestHandler extends Thread {
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
+
+            RequestInfo requestInfo = parseRequest(in);
             DataOutputStream dos = new DataOutputStream(out);
-            byte[] body = "Hello World".getBytes();
+
+            Controller controller =  new Controller(requestInfo);
+            byte[] body = controller.makeBody();
+
             response200Header(dos, body.length);
             responseBody(dos, body);
         } catch (IOException e) {
@@ -51,5 +58,25 @@ public class RequestHandler extends Thread {
         } catch (IOException e) {
             log.error(e.getMessage());
         }
+    }
+
+    private RequestInfo parseRequest(InputStream in) throws IOException {
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
+        String line = bufferedReader.readLine();
+        String[] tokens = line.split(" ");
+
+        RequestInfo requestInfo = new RequestInfo(tokens[0], tokens[1], tokens[2]);
+
+        log.debug(line);
+        while ((line = bufferedReader.readLine()) != null) {
+            if (line.isEmpty()) {
+                break;
+            }
+            log.debug(line);
+            Pair pair = HttpRequestUtils.parseHeader(line);
+            requestInfo.putHeader(pair.getKey(), pair.getValue());
+        }
+
+        return requestInfo;
     }
 }
