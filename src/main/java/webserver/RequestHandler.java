@@ -4,10 +4,14 @@ import java.io.*;
 import java.net.Socket;
 import java.nio.file.Files;
 
+import controller.Action;
 import controller.Controller;
 import model.RequestInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import service.BaseService;
+import service.CreateService;
+import service.WebService;
 import util.HttpRequestUtils;
 import util.HttpRequestUtils.Pair;
 
@@ -29,8 +33,9 @@ public class RequestHandler extends Thread {
 
             RequestInfo requestInfo = parseRequest(in);
             DataOutputStream dos = new DataOutputStream(out);
+            WebService webService = checkService(requestInfo);
 
-            Controller controller =  new Controller(requestInfo);
+            Controller controller =  new Controller(requestInfo, webService);
             byte[] body = controller.makeBody();
 
             response200Header(dos, body.length);
@@ -78,5 +83,15 @@ public class RequestHandler extends Thread {
         }
 
         return requestInfo;
+    }
+
+    private WebService checkService(RequestInfo requestInfo) {
+        String url = requestInfo.getUrl();
+
+        if(url.contains(HttpRequestUtils.CREATE)) {
+            return new CreateService(requestInfo);
+        }
+
+        return new BaseService();
     }
 }

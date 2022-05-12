@@ -5,6 +5,9 @@ import model.RequestInfo;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import service.BaseService;
+import service.CreateService;
+import service.WebService;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,23 +23,10 @@ public class ControllerTest {
 
     private Controller controller;
 
-
-    @Test
-    public void makeBody_Hello() throws IOException {
-        requestInfo = new RequestInfo("GET", "/hello", "HTTP/1.1");
-        controller = new Controller(requestInfo);
-
-        byte[] actual = controller.makeBody();
-        byte[] helloBody = "Hello World".getBytes();
-
-        assertThat(actual.length, is(equalTo(helloBody.length)));
-        assertThat(actual, is(equalTo(helloBody)));
-    }
-
     @Test
     public void makeBody_index() throws IOException {
         requestInfo = new RequestInfo("GET", "/", "HTTP/1.1");
-        controller = new Controller(requestInfo);
+        controller = new Controller(requestInfo, new BaseService());
 
         byte[] actual = controller.makeBody();
         byte[] indexBody = Files.readAllBytes(new File("./webapp/index.html").toPath());
@@ -44,4 +34,17 @@ public class ControllerTest {
         assertThat(actual.length, is(indexBody.length));
         assertThat(actual, is(equalTo(indexBody)));
     }
+
+    @Test
+    public void createTest() throws IOException {
+        requestInfo = new RequestInfo("GET", "/user/create?userId=javajigi&password=123&name=JaeSung&email=javajigi%40slipp.net", "HTTP/1.1");
+        controller = new Controller(requestInfo, new CreateService(requestInfo));
+
+        byte[] actual = controller.makeBody();
+        byte[] indexBody = Files.readAllBytes(new File("./webapp/index.html").toPath());
+
+        assertThat(actual.length, is(indexBody.length));
+        assertThat(actual, is(equalTo(indexBody)));
+    }
+
 }

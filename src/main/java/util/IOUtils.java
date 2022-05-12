@@ -1,7 +1,9 @@
 package util;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 
 public class IOUtils {
     /**
@@ -16,5 +18,13 @@ public class IOUtils {
         char[] body = new char[contentLength];
         br.read(body, 0, contentLength);
         return String.copyValueOf(body);
+    }
+
+    public static byte[] makeIndexBody() throws IOException {
+        return Files.readAllBytes(new File("./webapp/index.html").toPath());
+    }
+
+    public static byte[] makeUserFormBody() throws IOException {
+        return Files.readAllBytes(new File("./webapp/user/form.html").toPath());
     }
 }

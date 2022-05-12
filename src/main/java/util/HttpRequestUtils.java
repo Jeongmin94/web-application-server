@@ -6,8 +6,16 @@ import java.util.stream.Collectors;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
+import controller.Action;
+import controller.Controller;
 
 public class HttpRequestUtils {
+
+    public static final String WEBAPP = "./webapp";
+    public static final String INDEX = "/index.html";
+    public static final String USER_FORM = "/user/form.html";
+    public static final String CREATE = "/user/create";
+
     /**
      * @param queryString은
      *            URL에서 ? 이후에 전달되는 field1=value1&field2=value2 형식임
@@ -51,6 +59,18 @@ public class HttpRequestUtils {
 
     public static Pair parseHeader(String header) {
         return getKeyValue(header, ": ");
+    }
+
+    public static Action checkUrl(String url) {
+        if(url.contains(USER_FORM)) {
+            return Action.USER_FORM;
+        }
+
+        if(url.contains(CREATE)) {
+            return Action.CREATE;
+        }
+
+        return Action.INDEX;
     }
 
     public static class Pair {
