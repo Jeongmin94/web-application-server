@@ -8,6 +8,7 @@ public class RequestInfo {
     private String url;
     private String version;
     private Map<String, String> headerMap;
+    private String body;
 
     public RequestInfo(String method, String url, String version) {
         this.method = method;
@@ -31,5 +32,13 @@ public class RequestInfo {
 
     public String getHeader(String key) {
         return headerMap.get(key);
+    }
+
+    public void setBody(String body) {
+        this.body = body;
+    }
+
+    public String getBody() {
+        return this.body;
     }
 }

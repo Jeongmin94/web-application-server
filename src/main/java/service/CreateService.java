@@ -2,11 +2,15 @@ package service;
 
 import model.RequestInfo;
 import model.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import util.HttpRequestUtils;
+import webserver.RequestHandler;
 
 import java.util.Map;
 
 public class CreateService implements WebService {
+    private static final Logger log = LoggerFactory.getLogger(CreateService.class);
 
     private RequestInfo requestInfo;
 
@@ -18,16 +22,39 @@ public class CreateService implements WebService {
 
     @Override
     public void doSomething() {
+        if (requestInfo.getMethod().equals("GET")) {
+            user = getMethodCreate();
+        }
+
+        if(requestInfo.getMethod().equals("POST")) {
+            user = postMethodCreate();
+        }
+
+        log.debug(user.toString());
+    }
+
+    private User getMethodCreate() {
         String url = requestInfo.getUrl();
         int index = url.indexOf("?");
 
-        Map<String, String> queryStringMap = HttpRequestUtils.parseQueryString(url.substring(index + 1, url.length()));
+        return makeUser(url.substring(index + 1));
+    }
 
-        String username = queryStringMap.get("username");
-        String password = queryStringMap.get("password");
-        String name = queryStringMap.get("name");
-        String email = queryStringMap.get("email");
+    private User postMethodCreate() {
+        String body = requestInfo.getBody();
 
-        user = new User(username, password, name, email);
+        return makeUser(body);
+    }
+
+    private User makeUser(String data) {
+        log.debug(data);
+        Map<String, String> infoMap = HttpRequestUtils.parseQueryString(data);
+
+        String username = infoMap.get("userId");
+        String password = infoMap.get("password");
+        String name = infoMap.get("name");
+        String email = infoMap.get("email");
+
+        return new User(username, password, name, email);
     }
 }

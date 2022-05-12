@@ -2,9 +2,7 @@ package webserver;
 
 import java.io.*;
 import java.net.Socket;
-import java.nio.file.Files;
 
-import controller.Action;
 import controller.Controller;
 import model.RequestInfo;
 import org.slf4j.Logger;
@@ -14,6 +12,7 @@ import service.CreateService;
 import service.WebService;
 import util.HttpRequestUtils;
 import util.HttpRequestUtils.Pair;
+import util.IOUtils;
 
 public class RequestHandler extends Thread {
     private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
@@ -73,6 +72,18 @@ public class RequestHandler extends Thread {
         RequestInfo requestInfo = new RequestInfo(tokens[0], tokens[1], tokens[2]);
 
         log.debug(line);
+        if(requestInfo.getMethod().equals("GET")) {
+            parserGetMethod(requestInfo, line, bufferedReader);
+        }
+
+        if(requestInfo.getMethod().equals("POST")) {
+            parsePostMethod(requestInfo, line, bufferedReader);
+        }
+
+        return requestInfo;
+    }
+
+    private void parserGetMethod(RequestInfo requestInfo, String line, BufferedReader bufferedReader) throws IOException {
         while ((line = bufferedReader.readLine()) != null) {
             if (line.isEmpty()) {
                 break;
@@ -81,8 +92,23 @@ public class RequestHandler extends Thread {
             Pair pair = HttpRequestUtils.parseHeader(line);
             requestInfo.putHeader(pair.getKey(), pair.getValue());
         }
+    }
 
-        return requestInfo;
+    private void parsePostMethod(RequestInfo requestInfo, String line, BufferedReader bufferedReader) throws IOException {
+        while ((line = bufferedReader.readLine()) != null) {
+            if (line.isEmpty()) {
+                break;
+            }
+
+            log.debug(line);
+            Pair pair = HttpRequestUtils.parseHeader(line);
+            requestInfo.putHeader(pair.getKey(), pair.getValue());
+        }
+
+        String contentLength = requestInfo.getHeader("Content-Length");
+        String body = IOUtils.readData(bufferedReader, Integer.parseInt(contentLength));
+
+        requestInfo.setBody(body);
     }
 
     private WebService checkService(RequestInfo requestInfo) {
