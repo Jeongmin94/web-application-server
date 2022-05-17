@@ -55,6 +55,9 @@ public class CreateService implements WebService {
         String name = infoMap.get("name");
         String email = infoMap.get("email");
 
-        return new User(username, password, name, email);
+        User user = new User(username, password, name, email);
+        LoginService.addUser(user);
+
+        return user;
     }
 }

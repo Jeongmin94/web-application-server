@@ -1,7 +1,7 @@
 package controller;
 
 public enum Action {
-    INDEX("/index.html"), USER_FORM("/user/form.html"), CREATE("/create");
+    INDEX("/index.html"), USER_FORM("/user/form.html"), CREATE("/create"), LOGIN("/user/login.html");
 
     private String path;
 

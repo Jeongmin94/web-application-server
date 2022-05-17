@@ -5,10 +5,13 @@ import java.net.Socket;
 
 import controller.Controller;
 import model.RequestInfo;
+import model.ResponseInfo;
+import model.StatusCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import service.BaseService;
 import service.CreateService;
+import service.LoginService;
 import service.WebService;
 import util.HttpRequestUtils;
 import util.HttpRequestUtils.Pair;
@@ -35,10 +38,10 @@ public class RequestHandler extends Thread {
             WebService webService = checkService(requestInfo);
 
             Controller controller =  new Controller(requestInfo, webService);
-            byte[] body = controller.makeBody();
+            ResponseInfo responseInfo = controller.makeBody();
 
-            response200Header(dos, body.length);
-            responseBody(dos, body);
+            responseHeader(dos, responseInfo);
+            responseBody(dos, responseInfo.getBody());
         } catch (IOException e) {
             log.error(e.getMessage());
         }
@@ -52,6 +55,28 @@ public class RequestHandler extends Thread {
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             log.error(e.getMessage());
+        }
+    }
+
+    private void response302Header(DataOutputStream dos, int lengthOfBodyContent) {
+        try {
+            dos.writeBytes("HTTP/1.1 302 Found\r\n");
+            dos.writeBytes("Location: http://localhost:8080/webapp/index.html\r\n");
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        }
+    }
+
+    private void responseHeader(DataOutputStream dos, ResponseInfo responseInfo) {
+        byte[] body = responseInfo.getBody();
+        StatusCode statusCode = responseInfo.getStatusCode();
+
+        switch (statusCode) {
+            case FOUND:
+                response302Header(dos, body.length);
+                break;
+            default:
+                response200Header(dos, body.length);
         }
     }
 
@@ -116,6 +141,10 @@ public class RequestHandler extends Thread {
 
         if(url.contains(HttpRequestUtils.CREATE)) {
             return new CreateService(requestInfo);
+        }
+
+        if(url.contains(HttpRequestUtils.LOGIN)) {
+            return new LoginService(requestInfo);
         }
 
         return new BaseService();

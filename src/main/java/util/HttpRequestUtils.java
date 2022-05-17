@@ -15,6 +15,7 @@ public class HttpRequestUtils {
     public static final String INDEX = "/index.html";
     public static final String USER_FORM = "/user/form.html";
     public static final String CREATE = "/user/create";
+    public static final String LOGIN = "/user/login";
 
     /**
      * @param queryString은

@@ -1,6 +1,8 @@
 package controller;
 
 import model.RequestInfo;
+import model.ResponseInfo;
+import model.StatusCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import service.WebService;
@@ -14,6 +16,7 @@ public class Controller {
     private static final String INDEX = "/index.html";
     private static final String USER_FORM = "/user/form.html";
     private static final String CREATE = "/user/create";
+    private static final String LOGIN = "/user/login";
 
     private RequestInfo requestInfo;
 
@@ -24,15 +27,24 @@ public class Controller {
         this.webService = webService;
     }
 
-    public byte[] makeBody() throws IOException {
-        switch (checkUrl(requestInfo.getUrl())) {
-            case USER_FORM:
-                return IOUtils.makeUserFormBody();
-            case CREATE:
-                webService.doSomething();
-                return IOUtils.makeIndexBody();
-            default:
-                return IOUtils.makeIndexBody();
+    public ResponseInfo makeBody() throws IOException, RuntimeException {
+        try {
+            switch (checkUrl(requestInfo.getUrl())) {
+                case LOGIN:
+                    webService.doSomething();
+                    return new ResponseInfo(IOUtils.makeLoginFormBody(), StatusCode.OK);
+                case USER_FORM:
+                    return new ResponseInfo(IOUtils.makeUserFormBody(), StatusCode.OK);
+                case CREATE:
+                    webService.doSomething();
+                    return new ResponseInfo(IOUtils.makeUserFormBody(), StatusCode.FOUND);
+                default:
+                    return new ResponseInfo();
+            }
+        } catch (RuntimeException e) {
+            String msg = e.getMessage();
+            log.warn(msg);
+            return new ResponseInfo(IOUtils.makeLoginFailFormBody(), StatusCode.OK);
         }
     }
 
@@ -43,6 +55,10 @@ public class Controller {
 
         if(url.contains(CREATE)) {
             return Action.CREATE;
+        }
+
+        if(url.contains(LOGIN)) {
+            return Action.LOGIN;
         }
 
         return Action.INDEX;

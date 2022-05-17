@@ -27,4 +27,12 @@ public class IOUtils {
     public static byte[] makeUserFormBody() throws IOException {
         return Files.readAllBytes(new File("./webapp/user/form.html").toPath());
     }
+
+    public static byte[] makeLoginFormBody() throws IOException {
+        return Files.readAllBytes(new File("./webapp/user/login.html").toPath());
+    }
+
+    public static byte[] makeLoginFailFormBody() throws IOException {
+        return Files.readAllBytes(new File("./webapp/user/login_failed.html").toPath());
+    }
 }
