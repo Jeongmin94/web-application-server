@@ -34,6 +34,10 @@ public class RequestInfo {
         return headerMap.get(key);
     }
 
+    public Map<String, String> getHeaderMap() {
+        return this.headerMap;
+    }
+
     public void setBody(String body) {
         this.body = body;
     }

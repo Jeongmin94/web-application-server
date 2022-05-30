@@ -18,12 +18,21 @@ public class ResponseInfo {
         this.statusCode = statusCode;
     }
 
+    public ResponseInfo(StatusCode statusCode) throws IOException {
+        this.body = IOUtils.makeIndexBody();
+        this.statusCode = statusCode;
+    }
+
     public int getBodyLength() {
         return this.body.length;
     }
 
     public byte[] getBody() {
         return this.body;
+    }
+
+    public void setBody(byte[] body) {
+        this.body = body;
     }
 
     public StatusCode getStatusCode() {

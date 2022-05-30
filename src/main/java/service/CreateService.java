@@ -1,11 +1,11 @@
 package service;
 
+import db.DataBase;
 import model.RequestInfo;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.HttpRequestUtils;
-import webserver.RequestHandler;
 
 import java.util.Map;
 
@@ -56,7 +56,7 @@ public class CreateService implements WebService {
         String email = infoMap.get("email");
 
         User user = new User(username, password, name, email);
-        LoginService.addUser(user);
+        DataBase.addUser(user);
 
         return user;
     }

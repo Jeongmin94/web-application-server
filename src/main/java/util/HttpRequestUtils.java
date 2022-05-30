@@ -16,6 +16,11 @@ public class HttpRequestUtils {
     public static final String USER_FORM = "/user/form.html";
     public static final String CREATE = "/user/create";
     public static final String LOGIN = "/user/login";
+    public static final String LIST = "/user/list";
+    public static final String CSS = "./css/style.css";
+
+    public static final String GET = "GET";
+    public static final String POST = "POST";
 
     /**
      * @param queryString은
