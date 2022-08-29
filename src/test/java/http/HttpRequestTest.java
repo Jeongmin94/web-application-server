@@ -1,15 +1,15 @@
 package http;
 
-import static org.junit.Assert.*;
+import org.junit.Test;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 public class HttpRequestTest {
-    private String testDirectory = "./src/test/resources/";
+    private static final String testDirectory = "./src/test/resources/";
 
     @Test
     public void request_GET() throws Exception {

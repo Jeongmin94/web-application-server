@@ -6,9 +6,9 @@ import org.slf4j.LoggerFactory;
 public class RequestLine {
     private static final Logger log = LoggerFactory.getLogger(RequestLine.class);
 
-    private HttpMethod method;
+    private final HttpMethod method;
 
-    private String path;
+    private final String path;
     
     private String queryString;
     

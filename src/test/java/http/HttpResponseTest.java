@@ -8,7 +8,7 @@ import java.io.OutputStream;
 import org.junit.Test;
 
 public class HttpResponseTest {
-    private String testDirectory = "./src/test/resources/";
+    private static final String testDirectory = "./src/test/resources/";
 
     @Test
     public void responseForward() throws Exception {

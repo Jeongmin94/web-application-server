@@ -9,6 +9,8 @@ import controller.ListUserController;
 import controller.LoginController;
 
 public class RequestMapping {
+    private RequestMapping() {}
+
     private static Map<String, Controller> controllers = new HashMap<String, Controller>();
 
     static {

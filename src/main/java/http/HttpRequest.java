@@ -17,7 +17,7 @@ public class HttpRequest {
 
 	private HttpHeaders headers;
 	
-	private RequestParams requestParams = new RequestParams();
+	private final RequestParams requestParams = new RequestParams();
 
 	public HttpRequest(InputStream is) {
 		try {
@@ -40,12 +40,12 @@ public class HttpRequest {
 	}
 
 	private HttpHeaders processHeaders(BufferedReader br) throws IOException {
-		HttpHeaders headers = new HttpHeaders();
+		HttpHeaders newHeaders = new HttpHeaders();
 		String line;
 		while (!(line = br.readLine()).equals("")) {
-			headers.add(line);
+			newHeaders.add(line);
 		}
-		return headers;
+		return newHeaders;
 	}
 
 	public HttpMethod getMethod() {
