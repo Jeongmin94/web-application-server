@@ -1,20 +1,21 @@
 package controller;
 
+import db.DataBase;
+import db.SessionDataBase;
 import http.HttpRequest;
 import http.HttpResponse;
+import http.HttpSession;
+import model.User;
+import util.SessionUtils;
+import util.UrlUtils;
 
 import java.util.Collection;
-import java.util.Map;
-
-import model.User;
-import util.HttpRequestUtils;
-import db.DataBase;
 
 public class ListUserController extends AbstractController {
     @Override
     public void doGet(HttpRequest request, HttpResponse response) {
-        if (!isLogin(request.getHeader("Cookie"))) {
-            response.sendRedirect("/user/login.html");
+        if (!isLogin(request.getCookieValue(SessionUtils.JSESSIONID))) {
+            response.sendRedirect(UrlUtils.LOGIN_URL);
             return;
         }
 
@@ -32,12 +33,10 @@ public class ListUserController extends AbstractController {
         response.forwardBody(sb.toString());
     }
 
-    private boolean isLogin(String cookieValue) {
-        Map<String, String> cookies = HttpRequestUtils.parseCookies(cookieValue);
-        String value = cookies.get("logined");
-        if (value == null) {
-            return false;
-        }
-        return Boolean.parseBoolean(value);
+    private boolean isLogin(String sessionId) {
+        HttpSession session = SessionDataBase.getSession(sessionId);
+        User user = (User) session.getAttribute("user");
+
+        return user != null;
     }
 }

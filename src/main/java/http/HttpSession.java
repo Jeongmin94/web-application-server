@@ -8,6 +8,13 @@ public class HttpSession {
     private String id;
     private final Map<String, Object> attributes = new HashMap<>();
 
+    public HttpSession() {
+        id = null;
+    }
+
+    public HttpSession(String id) {
+        this.id = id;
+    }
 
     public String getId() {
         return id;

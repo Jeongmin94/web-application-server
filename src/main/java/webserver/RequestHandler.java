@@ -1,17 +1,21 @@
 package webserver;
 
+import controller.Controller;
+import db.SessionDataBase;
 import http.HttpRequest;
 import http.HttpResponse;
+import http.HttpSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import util.UrlUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.UUID;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import controller.Controller;
+import static util.SessionUtils.JSESSIONID;
 
 public class RequestHandler extends Thread {
     private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
@@ -30,6 +34,12 @@ public class RequestHandler extends Thread {
             HttpRequest request = new HttpRequest(in);
             HttpResponse response = new HttpResponse(out);
 
+            if (!request.isSessionExist() && request.isHtmlExtend()) {
+                UUID id = UUID.randomUUID();
+                response.addHeader("Set-Cookie", JSESSIONID + "=" + id);
+                SessionDataBase.addSession(new HttpSession(id.toString()));
+            }
+
             Controller controller = RequestMapping.getController(request.getPath());
             if (controller == null) {
                 String path = getDefaultPath(request.getPath());
@@ -44,8 +54,19 @@ public class RequestHandler extends Thread {
 
     private String getDefaultPath(String path) {
         if (path.equals("/")) {
-            return "/index.html";
+            return UrlUtils.INDEX_URL;
         }
         return path;
+    }
+
+    private boolean checkSessionExist(HttpRequest request) {
+        String sessionId = request.getCookieValue(JSESSIONID);
+        if (sessionId == null) {
+            return false;
+        }
+
+        HttpSession session = SessionDataBase.getSession(sessionId);
+
+        return session != null;
     }
 }
